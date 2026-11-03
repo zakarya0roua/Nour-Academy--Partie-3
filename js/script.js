@@ -88,3 +88,37 @@ ele.forEach(i => {
     listeEleves.append(i)
 });
 
+
+compteur.textContent = `${eleves.length} élèves`
+
+
+groupes.forEach((Option) => {
+    const option = document.createElement("option")
+    option.textContent = Option.nom
+    option.value = Option.id
+    filtreGroupe.append(option)
+})
+
+function afficherEleves() {
+    listeEleves.replaceChildren()
+    const filterGroAndReh = eleves.filter((eleve) => 
+        { 
+            const verifiGro = (eleve.groupeId === Number(filtreGroupe.value)) || (filtreGroupe.value === "")
+            const verifiRech = (eleve.nom.toLowerCase().includes(recherche.value.toLowerCase())) || eleve.prenom.toLowerCase().includes(recherche.value.toLowerCase())
+            return (verifiGro && verifiRech)
+        })
+    const cards = filterGroAndReh.map(creerLigne)
+    cards.forEach(card => {
+        listeEleves.append(card)
+    })
+    compteur.textContent = `${cards.length} élèves`
+}
+    
+
+filtreGroupe.addEventListener("change", () => {
+   afficherEleves()
+})
+
+recherche.addEventListener("input", () => {
+    afficherEleves()
+})
