@@ -67,7 +67,6 @@ function creerLigne(eleve){
     buttonFiche.append(spanMoyenne);
 
     
-    
     label.append(spanLabel)
     label.append(input)
     
@@ -79,6 +78,15 @@ function creerLigne(eleve){
     div1.append(div2)
     
     li.append(div1)
+
+    if(eleve.absences >= 3){
+    const spanAbsencesParents = document.createElement("span")
+    spanAbsencesParents.textContent = "Prévenir les parents"
+    spanAbsencesParents.classList.add("bg-red-200","text-red-800", "px-3", "py-1", "rounded-full", "text-[11px]", "font-medium")
+    li.append(spanAbsencesParents)
+    li.classList.add("border-red-500", "bg-red-300", "border-[3px]")
+    }
+    
     
     return (li)
 }
@@ -101,6 +109,7 @@ groupes.forEach((Option) => {
 
 function afficherEleves() {
     listeEleves.replaceChildren()
+    const aucunResultat = document.querySelector("#aucun-resultat")
     const filterGroAndReh = eleves.filter((eleve) => 
         { 
             const verifiGro = (eleve.groupeId === Number(filtreGroupe.value)) || (filtreGroupe.value === "")
@@ -112,6 +121,11 @@ function afficherEleves() {
         listeEleves.append(card)
     })
     compteur.textContent = `${cards.length} élèves`
+    if(cards.length === 0){
+        aucunResultat.hidden = false
+    }else{
+        aucunResultat.hidden = true
+    }
 }
     
 
@@ -121,4 +135,52 @@ filtreGroupe.addEventListener("change", () => {
 
 recherche.addEventListener("input", () => {
     afficherEleves()
+})
+
+
+
+
+
+listeEleves.addEventListener("click", (event) =>{
+    const button = event.target.closest("button")
+    if(!button) return
+
+    const buttonAB = button.classList.contains("btn-absent")
+    const buttonAJ =button.classList.contains("btn-note")
+    const li = event.target.closest("li")
+    const id = Number(li.dataset.id)
+    const eleveFind = eleves.find((eleve) => {return eleve.id === id})
+
+    if(buttonAB){
+        eleveFind.absences += 1
+        li.replaceWith(creerLigne(eleveFind))
+    }
+    else if(buttonAJ){
+        const li = event.target.closest("li")
+        const input = li.querySelector("input")
+        if(!input.value) {return}
+        
+        const inputValue = Number(input.value)
+        if(inputValue >= 0 && inputValue <=20){
+            eleveFind.notes.push(inputValue)
+            input.value = ""
+            li.replaceWith(creerLigne(eleveFind))
+            
+        }
+        else{
+            const errorNote = document.createElement("p")
+
+            errorNote.textContent = "La note doit être entre 0 et 20"
+            errorNote.classList.add("text-red-600", "text-sm", "mt-2", "error-note")
+            // xrt nta3 bax taficha mra wahda 
+            const errorLi = li.querySelector(".error-note")
+            if(errorLi) errorLi.remove()
+            li.append(errorNote)
+        }
+        
+
+    }
+
+
+
 })
